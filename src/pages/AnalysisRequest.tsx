@@ -20,11 +20,12 @@ const expertiseAreas = [
 - **実装の複雑さと保守性**: 長期的な運用の視点
 - **クラウド・インフラストラクチャ**: 実装が及ぼす影響
 
-出力は下記の形式のJSONで、コードブロック等の余計な記号は一切含まず、**純粋なJSON形式**のみで返してください：
+出力は下記の形式のJSONで、コードブロック等の余計な記号は含まず、**純粋なJSON形式**のみで返してください：
 
 {
   "summary": "全体的な分析の要約（200文字程度）",
-  "keyPoints": ["重要なポイントを箇条書きで4-5個"],
+  "evaluationPoints": ["評価ポイントを箇条書きで4-5個"],
+  "reviewPoints": ["専門家によるさらなる分析が必要な要検討ポイントを箇条書きで"],
   "references": [
     {
       "title": "参考文献やリソースのタイトル",
@@ -50,7 +51,8 @@ const expertiseAreas = [
 
 {
   "summary": "全体的な分析の要約（200文字程度）",
-  "keyPoints": ["重要なポイントを箇条書きで4-5個"],
+  "evaluationPoints": ["評価ポイントを箇条書きで4-5個"],
+  "reviewPoints": ["専門家によるさらなる分析が必要な要検討ポイントを箇条書きで"],
   "references": [
     {
       "title": "参考文献やリソースのタイトル",
@@ -76,7 +78,8 @@ const expertiseAreas = [
 
 {
   "summary": "全体的な分析の要約（200文字程度）",
-  "keyPoints": ["重要なポイントを箇条書きで4-5個"],
+  "evaluationPoints": ["評価ポイントを箇条書きで4-5個"],
+  "reviewPoints": ["専門家によるさらなる分析が必要な要検討ポイントを箇条書きで"],
   "references": [
     {
       "title": "参考文献やリソースのタイトル",
@@ -102,7 +105,8 @@ const expertiseAreas = [
 
 {
   "summary": "全体的な分析の要約（200文字程度）",
-  "keyPoints": ["重要なポイントを箇条書きで4-5個"],
+  "evaluationPoints": ["評価ポイントを箇条書きで4-5個"],
+  "reviewPoints": ["専門家によるさらなる分析が必要な要検討ポイントを箇条書きで"],
   "references": [
     {
       "title": "参考文献やリソースのタイトル",
@@ -121,7 +125,8 @@ export default function AnalysisRequest() {
   const [isLoading, setIsLoading] = useState(false);
   const [aiAnalysis, setAiAnalysis] = useState<{
     summary: string;
-    keyPoints: string[];
+    evaluationPoints: string[];
+    reviewPoints: string[];
     references: { title: string; relevance: string }[];
     confidence: number;
   } | null>(null);
@@ -316,12 +321,26 @@ ${chatGPTResponse}`
                   </div>
 
                   <div>
-                    <h4 className="font-medium text-gray-700 mb-2">主要ポイント</h4>
+                    <h4 className="font-medium text-gray-700 mb-2">評価ポイント</h4>
                     <ul className="space-y-2">
-                      {aiAnalysis?.keyPoints.map((point, index) => (
+                      {aiAnalysis?.evaluationPoints.map((point, index) => (
                         <li key={index} className="flex items-start gap-2">
-                          <Target className="w-5 h-5 text-indigo-600 flex-shrink-0 mt-0.5" />
-                          <span className="text-gray-600">{point}</span>
+                          {/* 緑色で表示 */}
+                          <Target className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
+                          <span className="text-green-700">{point}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+
+                  <div>
+                    <h4 className="font-medium text-gray-700 mb-2">要検討ポイント</h4>
+                    <ul className="space-y-2">
+                      {aiAnalysis?.reviewPoints.map((point, index) => (
+                        <li key={index} className="flex items-start gap-2">
+                          {/* 赤色で表示 */}
+                          <Target className="w-5 h-5 text-red-500 flex-shrink-0 mt-0.5" />
+                          <span className="text-red-700">{point}</span>
                         </li>
                       ))}
                     </ul>
