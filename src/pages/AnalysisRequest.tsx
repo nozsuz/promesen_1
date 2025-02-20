@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { MessageSquare, Send, Code, Microscope, Briefcase, Palette, Brain, BookOpen, Target, ArrowRight } from 'lucide-react';
+import { MessageSquare, Send, Code, Microscope, Briefcase, Palette, Brain, BookOpen, Target } from 'lucide-react';
 import OpenAI from 'openai';
 
 const openai = new OpenAI({
@@ -20,7 +20,19 @@ const expertiseAreas = [
 - **実装の複雑さと保守性**: 長期的な運用の視点
 - **クラウド・インフラストラクチャ**: 実装が及ぼす影響
 
-出力は各項目ごとに箇条書きで、改善策とその理由を明示してください。`
+出力は下記の形式のJSONで、コードブロック等の余計な記号は一切含まず、**純粋なJSON形式**のみで返してください：
+
+{
+  "summary": "全体的な分析の要約（200文字程度）",
+  "keyPoints": ["重要なポイントを箇条書きで4-5個"],
+  "references": [
+    {
+      "title": "参考文献やリソースのタイトル",
+      "relevance": "その参考文献が関連する理由や重要性"
+    }
+  ],
+  "confidence": 85
+}`
   },
   {
     id: 'science',
@@ -34,7 +46,19 @@ const expertiseAreas = [
 - **研究倫理**: 倫理的配慮の有無
 - **再現性と検証可能性**: 結果の信頼度
 
-出力は各項目ごとに箇条書きで、改善策とその理由を明示してください。`
+出力は下記の形式のJSONで、コードブロック等の余計な記号は含まず、**純粋なJSON形式**のみで返してください：
+
+{
+  "summary": "全体的な分析の要約（200文字程度）",
+  "keyPoints": ["重要なポイントを箇条書きで4-5個"],
+  "references": [
+    {
+      "title": "参考文献やリソースのタイトル",
+      "relevance": "その参考文献が関連する理由や重要性"
+    }
+  ],
+  "confidence": 85
+}`
   },
   {
     id: 'business',
@@ -48,7 +72,19 @@ const expertiseAreas = [
 - **リスク管理**: 潜在的リスクとその対策
 - **競合優位性**: 戦略上の強みと弱み
 
-出力は各項目ごとに箇条書きで、改善策とその理由を明示してください。`
+出力は下記の形式のJSONで、コードブロック等の余計な記号は含まず、**純粋なJSON形式**のみで返してください：
+
+{
+  "summary": "全体的な分析の要約（200文字程度）",
+  "keyPoints": ["重要なポイントを箇条書きで4-5個"],
+  "references": [
+    {
+      "title": "参考文献やリソースのタイトル",
+      "relevance": "その参考文献が関連する理由や重要性"
+    }
+  ],
+  "confidence": 85
+}`
   },
   {
     id: 'arts',
@@ -62,10 +98,21 @@ const expertiseAreas = [
 - **実現可能性**: 技術的制約と実装可能性
 - **市場適応性**: トレンドとのマッチング
 
-出力は各項目ごとに箇条書きで、改善策とその理由を明示してください。`
+出力は下記の形式のJSONで、コードブロック等の余計な記号は含まず、**純粋なJSON形式**のみで返してください：
+
+{
+  "summary": "全体的な分析の要約（200文字程度）",
+  "keyPoints": ["重要なポイントを箇条書きで4-5個"],
+  "references": [
+    {
+      "title": "参考文献やリソースのタイトル",
+      "relevance": "その参考文献が関連する理由や重要性"
+    }
+  ],
+  "confidence": 85
+}`
   }
 ];
-
 
 export default function AnalysisRequest() {
   const [step, setStep] = useState(1);
@@ -98,21 +145,7 @@ export default function AnalysisRequest() {
         messages: [
           {
             role: "system",
-            content: `${expertise.systemPrompt}
-
-分析結果は以下の形式のJSONで返してください：
-
-{
-  "summary": "全体的な分析の要約（200文字程度）",
-  "keyPoints": ["重要なポイントを箇条書きで4-5個"],
-  "references": [
-    {
-      "title": "参考文献やリソースのタイトル",
-      "relevance": "その参考文献が関連する理由や重要性"
-    }
-  ],
-  "confidence": 0-100の数値（回答の信頼性スコア）
-}`
+            content: `${expertise.systemPrompt}`
           },
           {
             role: "user",
@@ -123,7 +156,11 @@ ${chatGPTResponse}`
         ]
       });
 
-      const analysisResult = JSON.parse(completion.choices[0].message.content || '{}');
+      // 返答内容からコードブロック等の余計な記号を除去
+      let rawContent = completion.choices[0].message.content || '';
+      const cleanedContent = rawContent.replace(/```(json)?/g, '').replace(/```/g, '').trim();
+
+      const analysisResult = JSON.parse(cleanedContent);
       setAiAnalysis(analysisResult);
       setStep(2);
     } catch (error) {
