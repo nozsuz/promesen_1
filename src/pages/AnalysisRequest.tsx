@@ -166,6 +166,16 @@ ${chatGPTResponse}`
       const cleanedContent = rawContent.replace(/```(json)?/g, '').replace(/```/g, '').trim();
 
       const analysisResult = JSON.parse(cleanedContent);
+
+      // 評価ポイント（プラスポイント）と要検討ポイント（マイナスポイント）の件数から信頼性スコアを計算
+      const plusPoints = analysisResult.evaluationPoints ? analysisResult.evaluationPoints.length : 0;
+      const minusPoints = analysisResult.reviewPoints ? analysisResult.reviewPoints.length : 0;
+      const calculatedConfidence =
+        plusPoints + minusPoints > 0
+          ? Math.round((plusPoints / (plusPoints + minusPoints)) * 100)
+          : 50; // どちらもない場合はデフォルト50点
+
+      analysisResult.confidence = calculatedConfidence;
       setAiAnalysis(analysisResult);
       setStep(2);
     } catch (error) {
@@ -325,7 +335,6 @@ ${chatGPTResponse}`
                     <ul className="space-y-2">
                       {aiAnalysis?.evaluationPoints.map((point, index) => (
                         <li key={index} className="flex items-start gap-2">
-                          {/* 緑色で表示 */}
                           <Target className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
                           <span className="text-green-700">{point}</span>
                         </li>
@@ -338,7 +347,6 @@ ${chatGPTResponse}`
                     <ul className="space-y-2">
                       {aiAnalysis?.reviewPoints.map((point, index) => (
                         <li key={index} className="flex items-start gap-2">
-                          {/* 赤色で表示 */}
                           <Target className="w-5 h-5 text-red-500 flex-shrink-0 mt-0.5" />
                           <span className="text-red-700">{point}</span>
                         </li>
