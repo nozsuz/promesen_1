@@ -111,7 +111,7 @@ export default function AnalysisRequest() {
             role: "system",
             content: `${expertise.systemPrompt}
 
-分析結果は以下の形式のJSONで返してください：
+以下の形式で分析結果を返してください。必ず有効なJSONとして解析できる形式を守ってください：
 
 {
   "summary": "全体的な分析の要約（200文字程度）",
@@ -119,7 +119,7 @@ export default function AnalysisRequest() {
   "concernPoints": ["さらなる検討や専門家の意見が必要な点を3-4個"],
   "expertQuestions": ["専門家に確認すべき具体的な質問を3-4個"],
   "suggestedApproach": "専門家への相談アプローチの提案（200文字程度）",
-  "confidence": 0-100の数値（回答の信頼性スコア）
+  "confidence": 85
 }`
           },
           {
@@ -134,7 +134,8 @@ ${concerns}
 ユーザーが得たいアウトプット：
 ${desiredOutput}`
           }
-        ]
+        ],
+        response_format: { type: "json_object" } // JSON形式での応答を強制
       });
 
       const analysisResult = JSON.parse(completion.choices[0].message.content || '{}');
